@@ -3,6 +3,7 @@ import os
 import psutil
 import subprocess
 import time
+import atexit
 
 # Checks if the given process is currently running on this machine
 def checkIfProcessRunning(processName):
@@ -58,17 +59,37 @@ def getNetworkLoad(seconds):
 		oldValue = newValue
 		time.sleep(1)
 	return (avg/seconds)
+	
+	
+# Writes to the log file
+def log(message):
+	print(message)
+	# Tries to create a new log file if the current session doesn't already have one
+	try:
+		open(logPath, 'x')
+	except Exception as e:
+		pass
+	# Tries to open the log file and write the given message
+	try:
+		with open(logPath, 'a') as f:
+			currentTime = time.ctime(time.time()).replace('  ', ' ')
+			f.writelines('[' + currentTime + ']    ' + message + '\n')
+	except Exception as e:
+		print(str(e))
 
 
+client = discord.Client()
 server = 'java.exe'
 startServerScript = 'startserver-nogui.bat'
 backupScript = 'backup.bat'
-client = discord.Client()
+startTime = time.ctime(time.time())
+logPath = 'logs/DiscordBotLogs/' + startTime.replace(' ', '_').replace(':', '-') + '.txt'
+atexit.register(log, message='Client terminated!')
 
 # Discord client event listeners
 @client.event
 async def on_ready():
-	print('Logged in as {0.user}'.format(client))
+	log('Logged in as {0.user}'.format(client))
 
 @client.event
 async def on_message(message):
@@ -79,19 +100,19 @@ async def on_message(message):
 
 	# Say hello to the bot :)
 	if (msg.startswith('/hello')):
-		print ('command received: /hello')
+		log('command received: /hello')
 		await message.channel.send('Hello!')
 
 	
 	# Display list of commands and a short description of each one
 	if (msg.startswith('/help')):
-		print ('command received: /help')
+		log('command received: /help')
 		await message.channel.send('/status:    Shows the current status of the server.\n/start:       Starts the server.\n/stop:        Stops the server.\n/restart:    Restarts the server.\n/backup:   Creates a backup of the server.\n/load:         Checks the network load of the server host.\n/hello:        Hi!')
 
 
 	# Check the status of the server
 	if (msg.startswith('/status')):
-		print ('command received: /status')
+		log('command received: /status')
 		if (checkIfProcessRunning(server)):
 			await message.channel.send('Server Status: Running :white_check_mark:')
 			await message.channel.send('CPU:          ' + str(psutil.cpu_percent()) + '%')
@@ -103,7 +124,7 @@ async def on_message(message):
 	
 	# Start the server
 	if (msg.startswith('/start')):
-		print ('command received: /start')
+		log('command received: /start')
 		if (startProcess(startServerScript)):
 			await message.channel.send('Starting server. One moment please...')
 			time.sleep(15)
@@ -115,7 +136,7 @@ async def on_message(message):
 	
 	# Stop the server
 	if (msg.startswith('/stop')):
-		print ('command received: /stop')
+		log('command received: /stop')
 		if (killProcess(server)):
 			await message.channel.send('Server stopped.')
 		else:
@@ -125,7 +146,7 @@ async def on_message(message):
 
 	# Restart the server
 	if (msg.startswith('/restart')):
-		print ('command received: /restart')
+		log('command received: /restart')
 		if (killProcess(server)):
 			await message.channel.send('Server Stopped.')
 			if (startProcess(server)):
@@ -140,7 +161,7 @@ async def on_message(message):
 
 	# Backup the server
 	if (msg.startswith('/backup')):
-		print ('command received: /backup')
+		log('command received: /backup')
 		if (not checkIfProcessRunning(server)):
 			if (startProcess(backupScript)):
 				await message.channel.send('Backing up server. This may take a few minutes...')
@@ -154,7 +175,7 @@ async def on_message(message):
 
 	# Display current network load
 	if (msg.startswith('/load')):
-		print ('command received: /load')
+		log('command received: /load')
 		if (checkIfProcessRunning(server)):
 			await message.channel.send('Checking network load. One moment please...')
 			avgBandwidth = getNetworkLoad(10)
