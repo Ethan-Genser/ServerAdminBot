@@ -1,6 +1,10 @@
+# Ethan Genser 1/27/2021
+
 import discord
 import os
+import glob
 import psutil
+import shutil
 import subprocess
 import time
 import atexit
@@ -47,8 +51,10 @@ def killProcess(processName):
 def convertToMb(value):
     return value/1024./1024.*8
 
+def bytesToGigabytes(value):
+	return value/1024./1024./1024.
 
-# Gets average network load over a period of time
+# Returns the average network load over a period of time
 def getNetworkLoad(seconds):
 	avg = 0
 	oldValue = 0
@@ -60,6 +66,31 @@ def getNetworkLoad(seconds):
 		time.sleep(1)
 	return (avg/seconds)
 	
+
+# Returns the disk space used by backups and the space remaining
+def getArchiveSpace():
+	usage = shutil.disk_usage('/')
+	return usage
+	
+# Returns a list of every backup file in the server archive
+def getArchive():
+	files = glob.glob('/backups/*.zip')
+	files = sorted(files, key=os.path.getctime)
+	return files
+	
+# Returns a list of the dates of each backup
+def getBackupDates():
+	files = getArchive()
+	dates = []
+	for file in files:
+		dates.append(file.split(' ')[1].split('.')[0])
+	return dates
+
+# Returns the date of the latest backup
+def getLatestBackup():
+	dates = getBackupDates()
+	latest = dates[len(dates)-1]
+	return (latest, os.path.getsize('/backups/backup ' + latest + '.zip'))
 	
 # Writes to the log file
 def log(message):
@@ -107,7 +138,7 @@ async def on_message(message):
 	# Display list of commands and a short description of each one
 	if (msg.startswith('/help')):
 		log('command received: /help')
-		await message.channel.send('/status:    Shows the current status of the server.\n/start:       Starts the server.\n/stop:        Stops the server.\n/restart:    Restarts the server.\n/backup:   Creates a backup of the server.\n/load:         Checks the network load of the server host.\n/hello:        Hi!')
+		await message.channel.send('/status:    Shows the current status of the server.\n/start:       Starts the server.\n/stop:        Stops the server.\n/restart:    Restarts the server.\n/backup:   Creates a backup of the server.\n/load:         Checks the network load of the server host.\n/archive:   Shows server archive data and history.\n/hello:        Hi!')
 
 
 	# Check the status of the server
@@ -187,6 +218,19 @@ async def on_message(message):
 				await message.channel.send(':red_circle: Network load is high :red_circle:')
 		else:
 			await message.channel.send('Server is not running.')
+
+	# Display server archive information
+	if (msg.startswith('/archive')):
+		log('command received: /archive')
+		dates = getBackupDates()
+		stringDates = ''
+		for date in dates:
+			stringDates = stringDates + ':white_small_square:' + date + '\n'
+		await message.channel.send('Server backups:\n' + stringDates + '\n:black_small_square:')
+		latest = getLatestBackup()
+		await message.channel.send(':clock8: Latest backup:     ' + latest[0] + '     ' + str(round(bytesToGigabytes(latest[1]), 2)) + ' GB\n:black_small_square:')
+		usage = getArchiveSpace()
+		await message.channel.send(':floppy_disk: Disk space used: ' + str(round(bytesToGigabytes(usage.used), 2)) + ' GB\n       Disk space free: ' + str(round(bytesToGigabytes(usage.free), 2)) + ' GB')
 
 # Run discord client
 client.run(os.getenv('DISCORD_TOKEN'))
