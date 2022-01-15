@@ -7,4 +7,4 @@ set "HH=%dt:~8,2%" & set "Min=%dt:~10,2%" & set "Sec=%dt:~12,2%"
 set "datestamp=%MM%-%DD%-%YYYY%" & set "timestamp=%HH%:%Min%:%Sec%"
 set "fullstamp=%MM%-%DD%-%YYYY%_%HH%:%Min%:%Sec%"
 
-"C:\Program Files (x86)\7-Zip\7z.exe" a -tzip "C:\Users\Ethan\Desktop\MCServerTest\backups\backup %datestamp%" "C:\Users\Ethan\Desktop\MCServerTest\world"
+"C:\Program Files (x86)\7-Zip\7z.exe" a -tzip "backups\backup %datestamp%" "world\"

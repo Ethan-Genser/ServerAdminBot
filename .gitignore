@@ -1,0 +1,16 @@
+$RECYCLE.BIN/
+whitelist.json
+usercache.json
+server.properties
+server.jar
+ops.json
+eula.txt
+banned-players.json
+banned-ips.json
+world/
+versions/
+logs/
+libraries/
+crash-reports/
+backups/
+test.*

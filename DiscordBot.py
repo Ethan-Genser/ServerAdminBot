@@ -1,5 +1,3 @@
-# Ethan Genser 1/27/2021
-
 import discord
 import os
 import glob
@@ -46,7 +44,6 @@ def killProcess(processName):
 	else:
 		return ret
 
-
 # Converts bytes to megabits
 def convertToMb(value):
     return value/1024./1024.*8
@@ -66,7 +63,6 @@ def getNetworkLoad(seconds):
 		time.sleep(1)
 	return (avg/seconds)
 	
-
 # Returns the disk space used by backups and the space remaining
 def getArchiveSpace():
 	usage = shutil.disk_usage('/')
