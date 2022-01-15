@@ -1,6 +1,6 @@
 # ServerAdminBot
 Discord bot that allows users to manage a Minecraft server remotely
-![Cover](https://imgur.com/yAPaPFo.png)
+![Cover](https://imgur.com/7XLaizl.png)
 
 ## Prerequisites
 
