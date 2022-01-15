@@ -113,11 +113,13 @@ startTime = time.ctime(time.time())
 logPath = 'logs/DiscordBotLogs/' + startTime.replace(' ', '_').replace(':', '-') + '.txt'
 atexit.register(log, message='Client terminated!')
 
-# Discord client event listeners
+# Listens for when the bot has logged in and is ready to receive commands
 @client.event
 async def on_ready():
 	log('Logged in as {0.user}'.format(client))
 
+
+# Listens for commands
 @client.event
 async def on_message(message):
 	if (message.author == client.user):
@@ -125,18 +127,21 @@ async def on_message(message):
 
 	msg = message.content
 
+	# HELLO
 	# Say hello to the bot :)
 	if (msg.startswith('/hello')):
 		log('command received: /hello')
 		await message.channel.send('Hello!')
 
 	
+	# HELP
 	# Display list of commands and a short description of each one
 	if (msg.startswith('/help')):
 		log('command received: /help')
 		await message.channel.send('/status:    Shows the current status of the server.\n/start:       Starts the server.\n/stop:        Stops the server.\n/restart:    Restarts the server.\n/backup:   Creates a backup of the server.\n/load:         Checks the network load of the server host.\n/archive:   Shows server archive data and history.\n/hello:        Hi!')
 
 
+	# STATUS
 	# Check the status of the server
 	if (msg.startswith('/status')):
 		log('command received: /status')
@@ -149,6 +154,7 @@ async def on_message(message):
 			await message.channel.send('Pro Tip: If you would like to start the server use the /start command.')
 
 	
+	# START
 	# Start the server
 	if (msg.startswith('/start')):
 		log('command received: /start')
@@ -161,6 +167,7 @@ async def on_message(message):
 		
 
 	
+	# STOP
 	# Stop the server
 	if (msg.startswith('/stop')):
 		log('command received: /stop')
@@ -170,7 +177,7 @@ async def on_message(message):
 			await message.channel.send('Server is not running.')
 	
 
-
+	# RESTART
 	# Restart the server
 	if (msg.startswith('/restart')):
 		log('command received: /restart')
@@ -186,6 +193,7 @@ async def on_message(message):
 			await message.channel.send('Server is not running.')
 
 
+	# BACKUP
 	# Backup the server
 	if (msg.startswith('/backup')):
 		log('command received: /backup')
@@ -200,6 +208,7 @@ async def on_message(message):
 			await message.channel.send('I cannot backup the server while it is running.')
 	
 
+	# LOAD
 	# Display current network load
 	if (msg.startswith('/load')):
 		log('command received: /load')
@@ -215,6 +224,8 @@ async def on_message(message):
 		else:
 			await message.channel.send('Server is not running.')
 
+
+	# ARCHIVE
 	# Display server archive information
 	if (msg.startswith('/archive')):
 		log('command received: /archive')
